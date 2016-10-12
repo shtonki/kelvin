@@ -1,5 +1,4 @@
 import copy, numpy as np
-import matplotlib.pyplot as plt
 from gen import gendata
 
 
@@ -14,8 +13,8 @@ class lstm:
 
 
 
-    def __init__(self, inputs, outputs):
-        self.alpha = 0.8
+    def __init__(self, inputs, outputs, learningRate):
+        self.alpha = learningRate;
         self.input_dim = inputs;
         self.hidden_dim = 16
         self.output_dim = outputs;
@@ -30,7 +29,6 @@ class lstm:
 
     def train(self, sX, sy):
         sequenceSize = len(sX);
-        overallError = 0
         
         layer_2_deltas = list()
         layer_1_values = list()
@@ -46,17 +44,9 @@ class lstm:
                 ])
 
             layer_1 = sigmoid(np.dot(X,self.synapse_0) + np.dot(layer_1_values[-1],self.synapse_h))
-
             layer_2 = sigmoid(np.dot(layer_1,self.synapse_1))
-
             layer_2_error = y - layer_2
             layer_2_deltas.append((layer_2_error)*sigmoid_output_to_derivative(layer_2))
-            overallError += np.abs(layer_2_error[0])
-        
-            # decode estimate so we can print it out
-            #d[sequenceSize - position - 1] = np.round(layer_2[0][0])
-            
-            # store hidden layer so we can use it in the next timestep
             layer_1_values.append(copy.deepcopy(layer_1))
 
         synapse_0_update = 0
@@ -72,12 +62,9 @@ class lstm:
             layer_1 = layer_1_values[-position-1]
             prev_layer_1 = layer_1_values[-position-2]
             
-            # error at output layer
             layer_2_delta = layer_2_deltas[-position-1]
-            # error at hidden layer
             layer_1_delta = (future_layer_1_delta.dot(self.synapse_h.T) + layer_2_delta.dot(self.synapse_1.T)) * sigmoid_output_to_derivative(layer_1)
 
-            # let's update all our weights so we can try again
             synapse_1_update += np.atleast_2d(layer_1).T.dot(layer_2_delta)
             synapse_h_update += np.atleast_2d(prev_layer_1).T.dot(layer_1_delta)
             synapse_0_update += X.T.dot(layer_1_delta)
