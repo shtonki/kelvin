@@ -8,16 +8,13 @@ def loadit(s):
 
 def normalize(sp):
     xd = sp[0];
-    for r in range(10):
+    for r in range(len(sp)):
         sp[r] = list(map(lambda x, y: x/(2*y), sp[r], xd));
     return sp;
 
 def gendata(i, len):
-    sp = dataSP[i:i+len];
-    opn = sp[0][0];
-    xd = sp[0];
-    for r in range(len):
-        sp[r] = list(map(lambda x, y: x/(2*y), sp[r], xd));
+    opn = dataSP[i][0];
+    sp = normalize(dataSP[i:i+len]);
     rtnX = []
     rtnY = []
     for r in range(1, len-1):
@@ -28,7 +25,7 @@ def gendata(i, len):
             ]);
         rtnY.append([
         sp[r+1][3], #next day's close
-        1 if sp[r+1][0] > sp[r+1][3] else 0
+        #1 if sp[r+1][0] > sp[r+1][3] else 0
         ]); 
     return opn, rtnX, rtnY;
 
