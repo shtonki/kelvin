@@ -12,36 +12,39 @@ def normalize(sp):
         sp[r] = list(map(lambda x: x/(2*xd), sp[r]));
     return sp;
 
-def gendata(i, len):
-    opn = dataSP[i][0];
-    sp = normalize(dataSP[i:i+len]);
-    aux = normalize(dataAUX[i:i+len]);
-    vix = normalize(dataVIX[i:i+len]);
+def gendata(i, days):
+    opn = tables['gspc'][i][OP];
+    data = dict(map(lambda x: (x, normalize(tables[x][i:i+days])), sources))
     rtnX = []
     rtnY = []
-    for r in range(1, len-1):
+    for r in range(1, days-1):
         rtnX.append([
-            sp[r][0],   
-            sp[r][1],   
-            sp[r][2],   
-            sp[r][3],   
-            aux[r][0],  
-            vix[r][0],  
+            data['gspc'][r][OP],
+            data['gspc'][r][HI],
+            data['gspc'][r][LO],
+            data['gspc'][r][CL],
+            data['xau'][r][OP],
+            data['vix'][r][OP],
             ]);
         rtnY.append([
-        sp[r+1][3], #next day's close
-        #1 if sp[r+1][0] > sp[r+1][3] else 0
+        data['gspc'][r+1][3], #next day's close
         ]); 
     return opn, rtnX, rtnY;
 
-startDates = ['', '', '']
-startDates[0],  dataSP = loadit("sp");
-startDates[1], dataAUX = loadit("gold");
-startDates[1], dataVIX = loadit("vix");
+OP = 0;
+HI = 1;
+LO = 2;
+CL = 3;
 
-for i in range(1, len(startDates)):
+sources = ['gspc', 'xau', 'vix'];
+startDates, ds = list(zip(*list(map(lambda x: loadit(x), sources))));
+tables = {}
+
+
+for i in range(0, len(sources)):
     if (startDates[0] != startDates[i]):
         raise ValueError('Inconsistent start dates in data');
+    tables[sources[i]] = ds[i];
 
 if (__name__ == "__main__" and len(sys.argv) == 2):
     fh = sys.argv[1];
