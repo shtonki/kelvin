@@ -19,7 +19,7 @@ if (__name__ == "__main__"):
         clf = lstm(INPUTDIM, 1, 0.85);
 
         for i in range(1000):
-            o, X, y = gendata(0, DAYS);
+            o, X, y = gendata(i, DAYS);
             clf.train(X, y);
 
         profit = 0;
