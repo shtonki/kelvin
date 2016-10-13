@@ -6,15 +6,17 @@ from numpy import mean
 if (__name__ == "__main__"):
     _, X, _ = gendata(0, 3);
     INPUTDIM = len(X[0]);
+
     DAYS = 6;
     TRIALS = 10;
+    BIGASKQUOTA = 0.99976512037;
+    BUYTHRESHHOLD = 0.985;
 
     ess = [];
-    cor = 0;
-    inc = 0;
+    buckets = [[0, 0], [0, 0]];
     for i in range(TRIALS):
 
-        clf = lstm(INPUTDIM, 1, 0.8);
+        clf = lstm(INPUTDIM, 1, 0.85);
 
         for i in range(1000):
             o, X, y = gendata(0, DAYS);
@@ -26,13 +28,22 @@ if (__name__ == "__main__"):
             p = 2*o*clf.predict(X)[0][0];
             c = X[-1:][0][3]*2*o;
             a = 2*o*y[-1:][0][0];
-            if (p*0.98 > c):
-                cor += 1 if a > c else 0;
-                inc += 1 if a < c else 0;
-                profit += a*0.99 - c;
+
+            predBuy = 1 if p*BUYTHRESHHOLD > c else 0;
+            actualProfit = 1 if a*BIGASKQUOTA - c > 0 else 0;
+
+            buckets[predBuy][actualProfit] += 1;
+
+            if (predBuy == 1):
+                profit += a*BIGASKQUOTA - c;
 
         ess.append(profit);
-    print(mean(ess))
-    print(cor/(cor+inc));
+    print("DAYS...........", DAYS);
+    print("TRIALS.........", TRIALS);
+    print("BIGASKQUOTA....", BIGASKQUOTA);
+    print("BUYTHRESHHOLD..", BUYTHRESHHOLD);
+    print("Mean profit....", mean(ess))
+    print(buckets[0], "    ", buckets[0][0]/(buckets[0][0] + buckets[0][1]));
+    print(buckets[1], "    ", buckets[1][1]/(buckets[1][0] + buckets[1][1]));
 
     #plt.show();

@@ -16,7 +16,7 @@ class lstm:
     def __init__(self, inputs, outputs, learningRate):
         self.alpha = learningRate;
         self.input_dim = inputs;
-        self.hidden_dim = 16
+        self.hidden_dim = 24
         self.output_dim = outputs;
 
         self.synapse_0 = 2*np.random.random((self.input_dim,  self.hidden_dim)) - 1
