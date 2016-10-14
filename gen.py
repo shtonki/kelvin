@@ -1,40 +1,27 @@
 import re
 import pickle
 import sys
+import numpy as np
+import matplotlib.pyplot as plt
 
 def loadit(s):
     with open("data/" + s + ".p", "rb") as f:
         return pickle.load(f);
 
-def normalize(sp):
-    xd = sp[0][0];
-    for r in range(len(sp)):
-        sp[r] = list(map(lambda x: x/(2*xd), sp[r]));
-    return sp;
+def getdata(sources, startDay, endDay):
+    X = [];
+    y = [];
+    for (src, col) in sources:
+        o, tbl = tables[src];
+        X.append(tbl[col][startDay:endDay]);
+    for d in range(startDay, endDay):
+        y.append(tables['gspc'][1][CLOSE][d+1]);
+    return np.array(X), np.array(y);
 
-def gendata(i, days):
-    opn = tables['gspc'][i][OP];
-    data = dict(map(lambda x: (x, normalize(tables[x][i:i+days])), sources))
-    rtnX = []
-    rtnY = []
-    for r in range(1, days-1):
-        rtnX.append([
-            data['gspc'][r][OP],
-            data['gspc'][r][HI],
-            data['gspc'][r][LO],
-            data['gspc'][r][CL],
-            data['xau'][r][OP],
-            data['vix'][r][OP],
-            ]);
-        rtnY.append([
-        data['gspc'][r+1][3], #next day's close
-        ]); 
-    return opn, rtnX, rtnY;
-
-OP = 0;
-HI = 1;
-LO = 2;
-CL = 3;
+OPEN  = 0;
+HIGH  = 1;
+LOW   = 2;
+CLOSE = 3;
 
 sources = ['gspc', 'xau', 'vix'];
 startDates, ds = list(zip(*list(map(lambda x: loadit(x), sources))));
@@ -44,7 +31,21 @@ tables = {}
 for i in range(0, len(sources)):
     if (startDates[0] != startDates[i]):
         raise ValueError('Inconsistent start dates in data');
-    tables[sources[i]] = ds[i];
+    fk = np.array(ds[i]);
+    
+
+    ov = fk[0][0];
+    for rw in range(0, 4):
+        fk[rw] = list(map(lambda x: x/ov, fk[rw]));
+    mx = fk.max();
+    mn = fk.min();
+    xd = [0]*4
+    for j in range(0, 4):
+        vs = fk[:, j];
+        kolonp = mx-mn;
+        xd[j] = list(map(lambda x: (x-mn)/kolonp, vs));
+    tables[sources[i]] = ov, xd;
+
 
 if (__name__ == "__main__" and len(sys.argv) == 2):
     fh = sys.argv[1];
