@@ -7,7 +7,7 @@ if (__name__ == "__main__"):
     TRIALS = 1;
     for i in range(TRIALS):
 
-        clf = prn.CreateNN([4, 16, 1]);
+        clf = prn.CreateNN([4, 16, 1], dIn=[1,2],dIntern=[],dOut=[1,2,3]);
         X, y = getdata(
             [
                 ('gspc', OPEN),
@@ -16,8 +16,18 @@ if (__name__ == "__main__"):
                 ('gspc', CLOSE),
             ],
             0, 
-            1000);
-        clf = prn.train_LM(np.array(X), np.array(y), clf, verbose=True, k_max=50);
+            800);
+        clf = prn.train_LM(X, y, clf, verbose=True, k_max=10);
+
+        X0, y0 = getdata(
+            [
+                ('gspc', OPEN),
+                ('gspc', HIGH),
+                ('gspc', LOW),
+                ('gspc', CLOSE),
+            ],
+            775, 
+            800);
 
         X, y = getdata(
             [
@@ -26,10 +36,12 @@ if (__name__ == "__main__"):
                 ('gspc', LOW),
                 ('gspc', CLOSE),
             ],
-            1001, 
+            800, 
             1200);
 
-        p = prn.NNOut(X, clf);
+        p = prn.NNOut(X, clf, P0=X0, Y0=y0);
+        #p = np.zeros_like(p);
+        print(np.mean(list(map(lambda x, y: abs(x-y), p, y))));
         plt.plot(p);
         plt.plot(y);
         plt.show();

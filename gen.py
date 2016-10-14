@@ -18,6 +18,11 @@ def getdata(sources, startDay, endDay):
         y.append(tables['gspc'][1][CLOSE][d+1]);
     return np.array(X), np.array(y);
 
+def rescale(v):
+    return v*(mx-mn)*ov
+
+rsmx, rsmn, rsov = 0, 0, 0;
+
 OPEN  = 0;
 HIGH  = 1;
 LOW   = 2;
@@ -45,6 +50,8 @@ for i in range(0, len(sources)):
         kolonp = mx-mn;
         xd[j] = list(map(lambda x: (x-mn)/kolonp, vs));
     tables[sources[i]] = ov, xd;
+    if (sources[i] == 'gspc'):
+        rsmx, rsmn, rsov = mx, mn, ov;
 
 
 if (__name__ == "__main__" and len(sys.argv) == 2):
