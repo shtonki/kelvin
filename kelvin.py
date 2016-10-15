@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pyrenn as prn
 
-PREDICT = True;
+PREDICT = False;
 DAYSOFDATA = 1258;
 dataset = [
                 ('gspc', OPEN),
@@ -29,21 +29,32 @@ if (__name__ == "__main__"):
 
         trX, trY = getdata(dataset, 0, CO);
 
-        clf = prn.train_LM(trX, trY, clf,verbose=True,k_max=20,E_stop=0.2)
+        clf = prn.train_LM(trX, trY, clf,verbose=True,k_max=20,E_stop=0.1)
 
         if (PREDICT):
             o, p = predictFor(clf, 1258);
             print(o, p);
         else:
             cr, inc, profit = 0, 0, 0;
+            os = [];
+            ps = [];
+            az = [];
             for i in range(CO, 1257):
                 o, p = predictFor(clf, i)
                 a = getCloseFor(i)
-                if (p*0.99 > o):
-                    profit += a*0.995 - o;
+                os.append(o);
+                ps.append(p);
+                az.append(a);
+                #print(o, p, a);
+                if (p > o):
+                    profit += a - o;
                     if (a > o):
                         cr += 1;
                     else:
-                        incr += 1;
+                        inc += 1;
             print(cr, inc);
             print(profit);
+            #plt.plot(os);
+            plt.plot(ps);
+            plt.plot(az);
+            plt.show();
