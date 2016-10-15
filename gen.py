@@ -6,35 +6,22 @@ import matplotlib.pyplot as plt
 from math import sin
 from random import shuffle
 
-def be(i):
-    return [i >> d & 1 for d in range(10)]
-
-def fb(i):
-    if   i % 15 == 0: return [0, 0, 0, 1]
-    elif i % 5  == 0: return [0, 0, 1, 0]
-    elif i % 3  == 0: return [0, 1, 0, 0]
-    else:             return [1, 0, 0, 0]
-
 def loadit(s):
     with open("data/" + s + ".p", "rb") as f:
         return pickle.load(f);
 
-def getdatax(sources, s, e):
-    X = [];
-    y = [];
-    r = list(range(s, e));
-    for v in r:
-        X.append(v/1258);
-        y.append(sin(v/25));
-    return np.array(X), np.array(y);
+def getCloseFor(day):
+    return rescale(tables['gspc'][1][3][day]);
 
-def getdata(sources, startDay, endDay):
+def getdata(sources, startDay, endDay, noMemes = False):
     X = [];
     y = [];
     for (src, col) in sources:
         o, tbl = tables[src];
         X.append(tbl[col][startDay:endDay]);
     tmp = tables['gspc'][1][CLOSE];
+    if (noMemes):
+        return np.array(X);
     for d in range(startDay, endDay):
         y.append(tmp[d+1]);
     return np.array(X), np.array(y);
