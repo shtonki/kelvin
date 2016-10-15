@@ -10,8 +10,8 @@ dataset = [
                 ('gspc', HIGH),
                 ('gspc', LOW),
                 ('gspc', CLOSE),
-                ('vix',  OPEN),
-                ('xau',  OPEN),                
+                ('vix',  CLOSE),
+                ('xau',  CLOSE),                
             ];
 
 def predictFor(clf, day):
