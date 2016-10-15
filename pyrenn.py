@@ -795,7 +795,7 @@ def prepare_data(P,Y,net,P0=None,Y0=None):
 		
 	#Ceck if input and output data match structure of NN	
 	if np.shape(P)[0] != net['nn'][0]:
-		raise ValueError("Dimension of Input Data does not match number of inputs of the NN", np.shape(P)[0], net['nn'][0])
+		raise ValueError("Dimension of Input Data does not match number of inputs of the NN", np.shape(P)[0] , net['nn'][0])
 	if np.shape(Y)[0] != net['nn'][-1]:
 		raise ValueError("Dimension of Output Data does not match number of outputs of the NN")
 	if np.shape(P)[1] != np.shape(Y)[1]:

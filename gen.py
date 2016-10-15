@@ -3,10 +3,30 @@ import pickle
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
+from math import sin
+from random import shuffle
+
+def be(i):
+    return [i >> d & 1 for d in range(10)]
+
+def fb(i):
+    if   i % 15 == 0: return [0, 0, 0, 1]
+    elif i % 5  == 0: return [0, 0, 1, 0]
+    elif i % 3  == 0: return [0, 1, 0, 0]
+    else:             return [1, 0, 0, 0]
 
 def loadit(s):
     with open("data/" + s + ".p", "rb") as f:
         return pickle.load(f);
+
+def getdatax(sources, s, e):
+    X = [];
+    y = [];
+    r = list(range(s, e));
+    for v in r:
+        X.append(v/1258);
+        y.append(sin(v/25));
+    return np.array(X), np.array(y);
 
 def getdata(sources, startDay, endDay):
     X = [];
@@ -14,12 +34,13 @@ def getdata(sources, startDay, endDay):
     for (src, col) in sources:
         o, tbl = tables[src];
         X.append(tbl[col][startDay:endDay]);
+    tmp = tables['gspc'][1][CLOSE];
     for d in range(startDay, endDay):
-        y.append(tables['gspc'][1][CLOSE][d+1]);
+        y.append(tmp[d+1]);
     return np.array(X), np.array(y);
 
 def rescale(v):
-    return v*(mx-mn)*ov
+    return rsov*((v*(rsmx - rsmn))+rsmn)
 
 rsmx, rsmn, rsov = 0, 0, 0;
 
@@ -36,19 +57,17 @@ tables = {}
 for i in range(0, len(sources)):
     if (startDates[0] != startDates[i]):
         raise ValueError('Inconsistent start dates in data');
-    fk = np.array(ds[i]);
+    fk = np.array(ds[i]).T;
     
-
-    ov = fk[0][0];
+    ov = fk[OPEN][0];
     for rw in range(0, 4):
         fk[rw] = list(map(lambda x: x/ov, fk[rw]));
     mx = fk.max();
     mn = fk.min();
+    kolonp = mx-mn;
     xd = [0]*4
     for j in range(0, 4):
-        vs = fk[:, j];
-        kolonp = mx-mn;
-        xd[j] = list(map(lambda x: (x-mn)/kolonp, vs));
+        xd[j] = list(map(lambda x: (x-mn)/kolonp, fk[j]));
     tables[sources[i]] = ov, xd;
     if (sources[i] == 'gspc'):
         rsmx, rsmn, rsov = mx, mn, ov;
