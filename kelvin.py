@@ -54,7 +54,7 @@ if (__name__ == "__main__"):
                 os.append(o);
                 ps.append(p);
                 az.append(a);
-                a = a*0.9995;
+                a = a-0.5;
                 #   print(o, p, a);
                 if (p > o):
                     profit += a - o;
