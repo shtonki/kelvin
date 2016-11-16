@@ -1,0 +1,1 @@
+devenv /edit %1
