@@ -36,7 +36,7 @@ HIGH  = 1;
 LOW   = 2;
 CLOSE = 3;
 
-sources = ['gspc', 'xau', 'vix'];
+sources = ['gspc', 'xau', 'vix', 'TNX', 'N225'];
 startDates, ds = list(zip(*list(map(lambda x: loadit(x), sources))));
 tables = {}
 
